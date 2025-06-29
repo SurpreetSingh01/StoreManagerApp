@@ -1,4 +1,4 @@
-﻿import React, { useEffect} from 'react';
+﻿import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     fetchCustomers,
@@ -6,8 +6,7 @@ import {
     setModalType,
     setSelectedCustomer,
     setShowDeleteModal
-} from '../../redux/customerSlice'; // ✅ FIXED PATH
-
+} from '../../redux/customerSlice';
 import CustomerModal from './CustomerModal';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import { Button, Table } from 'react-bootstrap';
@@ -17,7 +16,6 @@ const CustomerList = () => {
     const customers = useSelector((state) => state.customers.customers);
     const showModal = useSelector((state) => state.customers.showModal);
     const showDeleteModal = useSelector((state) => state.customers.showDeleteModal);
-   
 
     useEffect(() => {
         dispatch(fetchCustomers());
@@ -41,18 +39,19 @@ const CustomerList = () => {
     };
 
     return (
-        <div className="mt-4">
+        <div className="container mt-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <h4>Customer List</h4>
                 <Button variant="primary" onClick={handleAdd}>New Customer</Button>
             </div>
 
             <Table striped bordered hover responsive>
-                <thead className="table-light">
+                <thead className="table-dark text-white">
                     <tr>
                         <th>Name</th>
                         <th>Address</th>
-                        <th colSpan={2} className="text-center">Actions</th>
+                        <th className="text-center">Actions</th>
+                        <th className="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>

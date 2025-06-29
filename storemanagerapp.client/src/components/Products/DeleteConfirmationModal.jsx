@@ -5,7 +5,8 @@ import {
     deleteProduct,
     setShowDeleteModal,
     setSelectedProduct
-} from '../redux/productSlice';
+} from '../../redux/productSlice';
+
 
 const DeleteConfirmationModal = () => {
     const dispatch = useDispatch();

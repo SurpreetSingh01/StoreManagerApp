@@ -8,7 +8,7 @@ import {
     setShowDeleteModal,
 } from '../../redux/productSlice';
 import ProductModal from './ProductModal';
-import DeleteConfirmationModal from '../DeleteConfirmationModal';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 import { Table, Button } from 'react-bootstrap';
 
 const ProductList = () => {

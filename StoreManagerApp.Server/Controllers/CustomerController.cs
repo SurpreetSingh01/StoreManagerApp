@@ -24,13 +24,13 @@ namespace StoreManagerApp.Server.Controllers
             return Ok(customers);
         }
 
-        // GET: api/customer/5
+        // GET: api/customer/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetById(int id)
         {
             var customer = await _context.Customers.FindAsync(id);
             if (customer == null)
-                return NotFound($"Customer with ID {id} not found.");
+                return NotFound(new { message = $"Customer with ID {id} not found." });
 
             return Ok(customer);
         }
@@ -39,6 +39,9 @@ namespace StoreManagerApp.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<Customer>> Create([FromBody] Customer customer)
         {
+            if (customer == null)
+                return BadRequest("Customer data is null.");
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -48,41 +51,39 @@ namespace StoreManagerApp.Server.Controllers
             return CreatedAtAction(nameof(GetById), new { id = customer.Id }, customer);
         }
 
-        // PUT: api/customer/5
+        // PUT: api/customer/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Customer updatedCustomer)
         {
-            if (id != updatedCustomer.Id)
-                return BadRequest("ID in URL and body do not match.");
+            if (updatedCustomer == null || id != updatedCustomer.Id)
+                return BadRequest("Invalid customer ID.");
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var existingCustomer = await _context.Customers.FindAsync(id);
             if (existingCustomer == null)
-                return NotFound($"Customer with ID {id} not found.");
+                return NotFound(new { message = $"Customer with ID {id} not found." });
 
             existingCustomer.Name = updatedCustomer.Name;
             existingCustomer.Address = updatedCustomer.Address;
 
-            _context.Customers.Update(existingCustomer);
             await _context.SaveChangesAsync();
-
-            return NoContent(); // 204
+            return Ok(existingCustomer);
         }
 
-        // DELETE: api/customer/5
+        // DELETE: api/customer/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var customer = await _context.Customers.FindAsync(id);
             if (customer == null)
-                return NotFound($"Customer with ID {id} not found.");
+                return NotFound(new { message = $"Customer with ID {id} not found." });
 
             _context.Customers.Remove(customer);
             await _context.SaveChangesAsync();
 
-            return NoContent(); // 204
+            return NoContent();
         }
     }
 }

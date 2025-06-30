@@ -17,29 +17,55 @@ namespace StoreManagerApp.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<IEnumerable<Product>>> GetAll()
         {
-            var products = await _context.Products.ToListAsync();
-            return Ok(products);
+            return Ok(await _context.Products.ToListAsync());
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Product product)
+        public async Task<ActionResult<Product>> Create([FromBody] Product product)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Product>> GetById(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+                return NotFound();
             return Ok(product);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] Product updatedProduct)
+        {
+            if (id != updatedProduct.Id)
+                return BadRequest();
+
+            var existing = await _context.Products.FindAsync(id);
+            if (existing == null)
+                return NotFound();
+
+            existing.Name = updatedProduct.Name;
+            existing.Price = updatedProduct.Price;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var product = await _context.Products.FindAsync(id);
-            if (product == null) return NotFound();
+            if (product == null)
+                return NotFound();
+
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
-            return Ok();
+            return NoContent();
         }
     }
 }

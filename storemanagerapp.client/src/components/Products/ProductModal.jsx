@@ -1,11 +1,11 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     createProduct,
     updateProduct,
-    setShowModal,
-   
+    fetchProducts,
+    setShowModal
 } from '../../redux/productSlice';
 
 const ProductModal = () => {
@@ -29,14 +29,16 @@ const ProductModal = () => {
 
     const handleClose = () => dispatch(setShowModal(false));
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
         const product = { name, price: parseFloat(price) };
+
         if (modalType === 'edit') {
-            dispatch(updateProduct({ ...selectedProduct, ...product }));
+            await dispatch(updateProduct({ ...selectedProduct, ...product }));
         } else {
-            dispatch(createProduct(product));
+            await dispatch(createProduct(product));
         }
+
+        await dispatch(fetchProducts()); // refresh list after add/edit
         handleClose();
     };
 
@@ -46,18 +48,18 @@ const ProductModal = () => {
                 <Modal.Title>{modalType === 'edit' ? 'Edit Product' : 'New Product'}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3" controlId="formProductName">
+                <Form>
+                    <Form.Group className="mb-3" controlId="productName">
                         <Form.Label>Name</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Enter product name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            required
                         />
                     </Form.Group>
-                    <Form.Group className="mb-3" controlId="formProductPrice">
+
+                    <Form.Group className="mb-3" controlId="productPrice">
                         <Form.Label>Price</Form.Label>
                         <Form.Control
                             type="number"
@@ -65,19 +67,16 @@ const ProductModal = () => {
                             placeholder="Enter price"
                             value={price}
                             onChange={(e) => setPrice(e.target.value)}
-                            required
                         />
                     </Form.Group>
-                    <div className="d-flex justify-content-end">
-                        <Button variant="secondary" onClick={handleClose} className="me-2">
-                            ❌ Cancel
-                        </Button>
-                        <Button variant="success" type="submit">
-                            {modalType === 'edit' ? '✏️ Update' : '➕ Create'}
-                        </Button>
-                    </div>
                 </Form>
             </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>Cancel</Button>
+                <Button variant="success" onClick={handleSubmit}>
+                    {modalType === 'edit' ? 'Update' : 'Create'}
+                </Button>
+            </Modal.Footer>
         </Modal>
     );
 };

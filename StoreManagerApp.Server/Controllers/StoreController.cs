@@ -17,19 +17,28 @@ namespace StoreManagerApp.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var stores = await _context.Stores.ToListAsync();
-            return Ok(stores);
-        }
+        public async Task<ActionResult<IEnumerable<Store>>> GetAll() =>
+            Ok(await _context.Stores.ToListAsync());
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Store store)
+        public async Task<ActionResult<Store>> Create([FromBody] Store store)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
             _context.Stores.Add(store);
             await _context.SaveChangesAsync();
-            return Ok(store);
+            return CreatedAtAction(nameof(GetAll), new { id = store.Id }, store);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] Store store)
+        {
+            if (id != store.Id) return BadRequest();
+            var existing = await _context.Stores.FindAsync(id);
+            if (existing == null) return NotFound();
+
+            existing.Name = store.Name;
+            existing.Address = store.Address;
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
@@ -39,7 +48,7 @@ namespace StoreManagerApp.Server.Controllers
             if (store == null) return NotFound();
             _context.Stores.Remove(store);
             await _context.SaveChangesAsync();
-            return Ok();
+            return NoContent();
         }
     }
 }

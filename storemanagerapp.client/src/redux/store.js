@@ -1,8 +1,16 @@
-import { configureStore } from '@reduxjs/toolkit';
+﻿import { configureStore } from '@reduxjs/toolkit';
 import customerReducer from './customerSlice';
+import productReducer from './productSlice';
+import storeReducer from './storeSlice';
+import saleReducer from './saleSlice'; 
 
-export const store = configureStore({
+const store = configureStore({
     reducer: {
-        customer: customerReducer,
+        customers: customerReducer,
+        products: productReducer,
+        stores: storeReducer,
+        sale: saleReducer, 
     },
 });
+
+export default store;

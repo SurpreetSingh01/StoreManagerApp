@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// Controllers/SaleController.cs
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StoreManagerApp.Server.Data;
 using StoreManagerApp.Server.Models;
@@ -17,24 +18,31 @@ namespace StoreManagerApp.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<IEnumerable<Sale>>> GetAll()
         {
-            var sales = await _context.Sales
-                .Include(s => s.Customer)
+            return await _context.Sales
                 .Include(s => s.Product)
+                .Include(s => s.Customer)
                 .Include(s => s.Store)
                 .ToListAsync();
-
-            return Ok(sales);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Sale sale)
+        public async Task<ActionResult<Sale>> Create(Sale sale)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
             _context.Sales.Add(sale);
             await _context.SaveChangesAsync();
             return Ok(sale);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, Sale sale)
+        {
+            if (id != sale.Id) return BadRequest();
+
+            _context.Entry(sale).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
@@ -42,9 +50,10 @@ namespace StoreManagerApp.Server.Controllers
         {
             var sale = await _context.Sales.FindAsync(id);
             if (sale == null) return NotFound();
+
             _context.Sales.Remove(sale);
             await _context.SaveChangesAsync();
-            return Ok();
+            return NoContent();
         }
     }
 }

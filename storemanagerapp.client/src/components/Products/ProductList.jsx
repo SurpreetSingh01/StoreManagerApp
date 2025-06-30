@@ -1,21 +1,17 @@
 ﻿import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
-    fetchProducts,
-    setShowModal,
-    setModalType,
-    setSelectedProduct,
-    setShowDeleteModal,
+    fetchProducts, setShowModal, setModalType, setSelectedProduct, setShowDeleteModal
 } from '../../redux/productSlice';
 import ProductModal from './ProductModal';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
-import { Table, Button } from 'react-bootstrap';
+import { Button, Table } from 'react-bootstrap';
 
 const ProductList = () => {
     const dispatch = useDispatch();
-    const products = useSelector((state) => state.products.products);
-    const showModal = useSelector((state) => state.products.showModal);
-    const showDeleteModal = useSelector((state) => state.products.showDeleteModal);
+    const products = useSelector(state => state.products.products);
+    const showModal = useSelector(state => state.products.showModal);
+    const showDeleteModal = useSelector(state => state.products.showDeleteModal);
 
     useEffect(() => {
         dispatch(fetchProducts());
@@ -39,18 +35,19 @@ const ProductList = () => {
     };
 
     return (
-        <div className="mt-4">
+        <div className="container mt-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <h4>Product List</h4>
                 <Button variant="primary" onClick={handleAdd}>New Product</Button>
             </div>
 
             <Table striped bordered hover responsive>
-                <thead className="table-light">
+                <thead className="table-dark text-white">
                     <tr>
                         <th>Name</th>
                         <th>Price</th>
-                        <th colSpan={2} className="text-center">Actions</th>
+                        <th className="text-center">Actions</th>
+                        <th className="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,19 +55,21 @@ const ProductList = () => {
                         products.map((product) => (
                             <tr key={product.id}>
                                 <td>{product.name}</td>
-                                <td>${product.price}</td>
+                                <td>${product.price.toFixed(2)}</td>
                                 <td className="text-center">
-                                    <Button variant="warning" size="sm" onClick={() => handleEdit(product)}>✏️ Edit</Button>
+                                    <Button variant="warning" size="sm" onClick={() => handleEdit(product)}>
+                                        ✏️ EDIT
+                                    </Button>
                                 </td>
                                 <td className="text-center">
-                                    <Button variant="danger" size="sm" onClick={() => handleDelete(product)}>🗑️ Delete</Button>
+                                    <Button variant="danger" size="sm" onClick={() => handleDelete(product)}>
+                                        🗑️ DELETE
+                                    </Button>
                                 </td>
                             </tr>
                         ))
                     ) : (
-                        <tr>
-                            <td colSpan="4" className="text-center">No products found.</td>
-                        </tr>
+                        <tr><td colSpan="4" className="text-center">No products found.</td></tr>
                     )}
                 </tbody>
             </Table>

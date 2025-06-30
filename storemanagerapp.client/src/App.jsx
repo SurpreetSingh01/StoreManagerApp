@@ -10,15 +10,17 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
     return (
         <Router>
-            <NavigationBar />
-            <div className="container mt-4">
-                <Routes>
-                    <Route path="/" element={<Navigate to="/customers" />} />
-                    <Route path="/customers" element={<CustomerPage />} />
-                    <Route path="/products" element={<ProductPage />} />
-                    <Route path="/sales" element={<SalePage />} />
-                    <Route path="/stores" element={<StorePage />} />
-                </Routes>
+            <div className="d-flex flex-column min-vh-100">
+                <NavigationBar />
+                <div className="flex-grow-1 px-4 py-3 bg-light">
+                    <Routes>
+                        <Route path="/" element={<Navigate to="/customers" />} />
+                        <Route path="/customers" element={<CustomerPage />} />
+                        <Route path="/products" element={<ProductPage />} />
+                        <Route path="/sale" element={<SalePage />} />
+                        <Route path="/stores" element={<StorePage />} />
+                    </Routes>
+                </div>
             </div>
         </Router>
     );

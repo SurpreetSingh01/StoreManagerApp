@@ -1,28 +1,57 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:7040/api/customers';
+const API_URL = 'https://localhost:7040/api/customer';
 
 // Async Thunks
-export const fetchCustomers = createAsyncThunk('customers/fetchCustomers', async () => {
-    const response = await axios.get(API_URL);
-    return response.data;
-});
+export const fetchCustomers = createAsyncThunk(
+    'customers/fetchCustomers',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(API_URL);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
 
-export const createCustomer = createAsyncThunk('customers/createCustomer', async (customer) => {
-    const response = await axios.post(API_URL, customer);
-    return response.data;
-});
+export const createCustomer = createAsyncThunk(
+    'customers/createCustomer',
+    async (customer, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(API_URL, customer);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
 
-export const updateCustomer = createAsyncThunk('customers/updateCustomer', async (customer) => {
-    const response = await axios.put(`${API_URL}/${customer.id}`, customer);
-    return response.data;
-});
+export const updateCustomer = createAsyncThunk(
+    'customers/updateCustomer',
+    async (customer, { rejectWithValue }) => {
+        try {
+            if (!customer.id) throw new Error("Missing ID for update");
+            const response = await axios.put(`${API_URL}/${customer.id}`, customer);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
 
-export const deleteCustomer = createAsyncThunk('customers/deleteCustomer', async (id) => {
-    await axios.delete(`${API_URL}/${id}`);
-    return id;
-});
+export const deleteCustomer = createAsyncThunk(
+    'customers/deleteCustomer',
+    async (id, { rejectWithValue }) => {
+        try {
+            await axios.delete(`${API_URL}/${id}`);
+            return id;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
 
 // Initial state
 const initialState = {
@@ -31,7 +60,7 @@ const initialState = {
     error: null,
     showModal: false,
     showDeleteModal: false,
-    modalType: 'create', // or 'edit'
+    modalType: 'create',
     selectedCustomer: null,
 };
 
@@ -55,6 +84,7 @@ const customerSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            // Fetch
             .addCase(fetchCustomers.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -65,25 +95,39 @@ const customerSlice = createSlice({
             })
             .addCase(fetchCustomers.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message;
+                state.error = action.payload;
             })
 
+            // Create
             .addCase(createCustomer.fulfilled, (state, action) => {
                 state.customers.push(action.payload);
             })
+            .addCase(createCustomer.rejected, (state, action) => {
+                state.error = action.payload;
+            })
+
+            // Update
             .addCase(updateCustomer.fulfilled, (state, action) => {
-                const index = state.customers.findIndex(c => c.id === action.payload.id);
-                if (index !== -1) {
-                    state.customers[index] = action.payload;
+                const idx = state.customers.findIndex(c => c.id === action.payload.id);
+                if (idx !== -1) {
+                    state.customers[idx] = action.payload;
                 }
             })
+            .addCase(updateCustomer.rejected, (state, action) => {
+                state.error = action.payload;
+            })
+
+            // Delete
             .addCase(deleteCustomer.fulfilled, (state, action) => {
                 state.customers = state.customers.filter(c => c.id !== action.payload);
+            })
+            .addCase(deleteCustomer.rejected, (state, action) => {
+                state.error = action.payload;
             });
-    }
+    },
 });
 
-// Export actions and reducer
+// Exports
 export const {
     setShowModal,
     setShowDeleteModal,

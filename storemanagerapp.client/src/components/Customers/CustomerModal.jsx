@@ -26,13 +26,16 @@ const CustomerModal = () => {
 
     const handleSubmit = () => {
         const customer = { name, address };
-        if (modalType === 'edit') {
-            dispatch(updateCustomer({ ...selectedCustomer, ...customer }));
+
+        if (modalType === 'edit' && selectedCustomer?.id) {
+            dispatch(updateCustomer({ ...customer, id: selectedCustomer.id }));
         } else {
             dispatch(createCustomer(customer));
         }
+
         handleClose();
     };
+
 
     return (
         <Modal show={showModal} onHide={handleClose} centered>

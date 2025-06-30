@@ -1,11 +1,13 @@
 import React from 'react';
+import Navbar from '../components/Navbar';
+import SaleList from '../components/Sale/SaleList.jsx';
 
 const SalePage = () => {
     return (
-        <div className="container mt-4">
-            <h3>Sales</h3>
-            <p>Sales page coming soon...</p>
-        </div>
+        <>
+          
+            <SaleList />
+        </>
     );
 };
 

@@ -1,11 +1,14 @@
+
 import React from 'react';
+import Navbar from '../components/Navbar';
+import StoreList from '../components/Store/StoreList';
 
 const StorePage = () => {
     return (
-        <div className="container mt-4">
-            <h3>Stores</h3>
-            <p>Store page coming soon...</p>
-        </div>
+        <>
+            
+            <StoreList />
+        </>
     );
 };
 

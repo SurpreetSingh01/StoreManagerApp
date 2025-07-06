@@ -14,8 +14,8 @@ const CustomerModal = () => {
 
     useEffect(() => {
         if (modalType === 'edit' && selectedCustomer) {
-            setName(selectedCustomer.name);
-            setAddress(selectedCustomer.address);
+            setName(selectedCustomer.name || '');
+            setAddress(selectedCustomer.address || '');
         } else {
             setName('');
             setAddress('');
@@ -25,7 +25,31 @@ const CustomerModal = () => {
     const handleClose = () => dispatch(setShowModal(false));
 
     const handleSubmit = () => {
-        const customer = { name, address };
+        // ✅ Validation logic
+        const trimmedName = name.trim();
+        const trimmedAddress = address.trim();
+
+        if (!trimmedName) {
+            alert("Customer name is required.");
+            return;
+        }
+
+        if (trimmedName.length < 2) {
+            alert("Customer name must be at least 2 characters.");
+            return;
+        }
+
+        if (!trimmedAddress) {
+            alert("Address is required.");
+            return;
+        }
+
+        if (trimmedAddress.length < 5) {
+            alert("Address must be at least 5 characters long.");
+            return;
+        }
+
+        const customer = { name: trimmedName, address: trimmedAddress };
 
         if (modalType === 'edit' && selectedCustomer?.id) {
             dispatch(updateCustomer({ ...customer, id: selectedCustomer.id }));
@@ -35,7 +59,6 @@ const CustomerModal = () => {
 
         handleClose();
     };
-
 
     return (
         <Modal show={showModal} onHide={handleClose} centered>
@@ -51,6 +74,8 @@ const CustomerModal = () => {
                             placeholder="Enter customer name"
                             value={name}
                             onChange={e => setName(e.target.value)}
+                            required
+                            minLength={2}
                         />
                     </Form.Group>
                     <Form.Group controlId="formCustomerAddress" className="mb-3">
@@ -60,6 +85,8 @@ const CustomerModal = () => {
                             placeholder="Enter address"
                             value={address}
                             onChange={e => setAddress(e.target.value)}
+                            required
+                            minLength={5}
                         />
                     </Form.Group>
                 </Form>

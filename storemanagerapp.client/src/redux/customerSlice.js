@@ -99,29 +99,47 @@ const customerSlice = createSlice({
             })
 
             // Create
+            .addCase(createCustomer.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(createCustomer.fulfilled, (state, action) => {
                 state.customers.push(action.payload);
+                state.loading = false;
             })
             .addCase(createCustomer.rejected, (state, action) => {
+                state.loading = false;
                 state.error = action.payload;
             })
 
             // Update
+            .addCase(updateCustomer.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(updateCustomer.fulfilled, (state, action) => {
                 const idx = state.customers.findIndex(c => c.id === action.payload.id);
                 if (idx !== -1) {
                     state.customers[idx] = action.payload;
                 }
+                state.loading = false;
             })
             .addCase(updateCustomer.rejected, (state, action) => {
+                state.loading = false;
                 state.error = action.payload;
             })
 
             // Delete
+            .addCase(deleteCustomer.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(deleteCustomer.fulfilled, (state, action) => {
                 state.customers = state.customers.filter(c => c.id !== action.payload);
+                state.loading = false;
             })
             .addCase(deleteCustomer.rejected, (state, action) => {
+                state.loading = false;
                 state.error = action.payload;
             });
     },

@@ -11,8 +11,8 @@ using StoreManagerApp.Server.Data;
 namespace StoreManagerApp.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250629225927_AddProductsStoresSales")]
-    partial class AddProductsStoresSales
+    [Migration("20250630061051_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,6 +46,7 @@ namespace StoreManagerApp.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Price")

@@ -57,7 +57,7 @@ const initialState = {
     products: [],
     showModal: false,
     showDeleteModal: false,
-    modalType: 'create', // 'create' or 'edit'
+    modalType: 'create',
     selectedProduct: null,
     loading: false,
     error: null,
@@ -75,7 +75,6 @@ const productSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-
             // Fetch
             .addCase(fetchProducts.pending, (state) => {
                 state.loading = true;
@@ -91,21 +90,48 @@ const productSlice = createSlice({
             })
 
             // Create
+            .addCase(createProduct.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(createProduct.fulfilled, (state, action) => {
                 state.products.push(action.payload);
+                state.loading = false;
+            })
+            .addCase(createProduct.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
             })
 
             // Update
+            .addCase(updateProduct.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(updateProduct.fulfilled, (state, action) => {
                 const index = state.products.findIndex(p => p.id === action.payload.id);
                 if (index !== -1) {
                     state.products[index] = action.payload;
                 }
+                state.loading = false;
+            })
+            .addCase(updateProduct.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
             })
 
             // Delete
+            .addCase(deleteProduct.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(deleteProduct.fulfilled, (state, action) => {
                 state.products = state.products.filter(p => p.id !== action.payload);
+                state.loading = false;
+            })
+            .addCase(deleteProduct.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
             });
     }
 });

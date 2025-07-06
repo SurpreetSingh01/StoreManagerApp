@@ -30,7 +30,31 @@ const ProductModal = () => {
     const handleClose = () => dispatch(setShowModal(false));
 
     const handleSubmit = async () => {
-        const product = { name, price: parseFloat(price) };
+        // ✅ Full Validation
+        const trimmedName = name.trim();
+        const numericPrice = parseFloat(price);
+
+        if (!trimmedName) {
+            alert("Product name is required.");
+            return;
+        }
+
+        if (trimmedName.length < 2) {
+            alert("Product name must be at least 2 characters.");
+            return;
+        }
+
+        if (price === '' || isNaN(numericPrice)) {
+            alert("Price is required and must be a valid number.");
+            return;
+        }
+
+        if (numericPrice <= 0) {
+            alert("Price must be greater than 0.");
+            return;
+        }
+
+        const product = { name: trimmedName, price: numericPrice };
 
         if (modalType === 'edit') {
             await dispatch(updateProduct({ ...selectedProduct, ...product }));
@@ -38,7 +62,7 @@ const ProductModal = () => {
             await dispatch(createProduct(product));
         }
 
-        await dispatch(fetchProducts()); // refresh list after add/edit
+        await dispatch(fetchProducts());
         handleClose();
     };
 
@@ -56,6 +80,8 @@ const ProductModal = () => {
                             placeholder="Enter product name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
+                            required
+                            minLength={2}
                         />
                     </Form.Group>
 
@@ -67,6 +93,8 @@ const ProductModal = () => {
                             placeholder="Enter price"
                             value={price}
                             onChange={(e) => setPrice(e.target.value)}
+                            required
+                            min={0.01}
                         />
                     </Form.Group>
                 </Form>

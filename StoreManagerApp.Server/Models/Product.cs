@@ -11,5 +11,8 @@ namespace StoreManagerApp.Server.Models
 
         [Required]
         public decimal Price { get; set; }
+
+        // Navigation: A product can appear in many sales
+        public ICollection<Sale> Sales { get; set; } = new List<Sale>();
     }
 }

@@ -19,8 +19,8 @@ const StoreModal = () => {
 
     useEffect(() => {
         if (modalType === 'edit' && selectedStore) {
-            setName(selectedStore.name);
-            setAddress(selectedStore.address);
+            setName(selectedStore.name || '');
+            setAddress(selectedStore.address || '');
         } else {
             setName('');
             setAddress('');
@@ -30,12 +30,30 @@ const StoreModal = () => {
     const handleClose = () => dispatch(setShowModal(false));
 
     const handleSubmit = async () => {
-        if (!name.trim() || !address.trim()) {
-            alert("Name and Address are required.");
+        const trimmedName = name.trim();
+        const trimmedAddress = address.trim();
+
+        if (!trimmedName) {
+            alert("Store name is required.");
             return;
         }
 
-        const store = { name, address };
+        if (trimmedName.length < 2) {
+            alert("Store name must be at least 2 characters.");
+            return;
+        }
+
+        if (!trimmedAddress) {
+            alert("Address is required.");
+            return;
+        }
+
+        if (trimmedAddress.length < 5) {
+            alert("Address must be at least 5 characters long.");
+            return;
+        }
+
+        const store = { name: trimmedName, address: trimmedAddress };
 
         if (modalType === 'edit') {
             await dispatch(updateStore({ ...selectedStore, ...store }));
@@ -43,9 +61,7 @@ const StoreModal = () => {
             await dispatch(createStore(store));
         }
 
-        // Ensure the list updates
         await dispatch(fetchStores());
-
         handleClose();
     };
 
@@ -59,17 +75,23 @@ const StoreModal = () => {
                     <Form.Group className="mb-3">
                         <Form.Label>Name</Form.Label>
                         <Form.Control
+                            type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="Enter store name"
+                            required
+                            minLength={2}
                         />
                     </Form.Group>
                     <Form.Group>
                         <Form.Label>Address</Form.Label>
                         <Form.Control
+                            type="text"
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
                             placeholder="Enter address"
+                            required
+                            minLength={5}
                         />
                     </Form.Group>
                 </Form>

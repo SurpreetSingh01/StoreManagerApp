@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using StoreManagerApp.Server.Data;
 using StoreManagerApp.Server.Models;
+using StoreManagerApp.Server.Dtos;
 
 namespace StoreManagerApp.Server.Controllers
 {
@@ -18,58 +19,74 @@ namespace StoreManagerApp.Server.Controllers
 
         // GET: api/customer
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetAll()
+        public async Task<ActionResult<IEnumerable<CustomerDto>>> GetAll()
         {
             var customers = await _context.Customers.ToListAsync();
-            return Ok(customers);
+
+            var customerDtos = customers.Select(c => new CustomerDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Address = c.Address
+            });
+
+            return Ok(customerDtos);
         }
 
         // GET: api/customer/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetById(int id)
+        public async Task<ActionResult<CustomerDto>> GetById(int id)
         {
             var customer = await _context.Customers.FindAsync(id);
             if (customer == null)
                 return NotFound(new { message = $"Customer with ID {id} not found." });
 
-            return Ok(customer);
+            var dto = new CustomerDto
+            {
+                Id = customer.Id,
+                Name = customer.Name,
+                Address = customer.Address
+            };
+
+            return Ok(dto);
         }
 
         // POST: api/customer
         [HttpPost]
-        public async Task<ActionResult<Customer>> Create([FromBody] Customer customer)
+        public async Task<ActionResult<CustomerDto>> Create([FromBody] CustomerDto dto)
         {
-            if (customer == null)
-                return BadRequest("Customer data is null.");
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            var customer = new Customer
+            {
+                Name = dto.Name,
+                Address = dto.Address
+            };
 
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = customer.Id }, customer);
+            dto.Id = customer.Id;
+            return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
         }
 
         // PUT: api/customer/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Customer updatedCustomer)
+        public async Task<IActionResult> Update(int id, [FromBody] CustomerDto dto)
         {
-            if (updatedCustomer == null || id != updatedCustomer.Id)
-                return BadRequest("Invalid customer ID.");
+            if (dto == null || id != dto.Id)
+                return BadRequest("Invalid customer data.");
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var existingCustomer = await _context.Customers.FindAsync(id);
-            if (existingCustomer == null)
+            var customer = await _context.Customers.FindAsync(id);
+            if (customer == null)
                 return NotFound(new { message = $"Customer with ID {id} not found." });
 
-            existingCustomer.Name = updatedCustomer.Name;
-            existingCustomer.Address = updatedCustomer.Address;
+            customer.Name = dto.Name;
+            customer.Address = dto.Address;
 
             await _context.SaveChangesAsync();
-            return Ok(existingCustomer);
+            return Ok(dto);
         }
 
         // DELETE: api/customer/{id}

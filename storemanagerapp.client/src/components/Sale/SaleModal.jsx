@@ -1,25 +1,50 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
+
 import {
-    createSale, updateSale, fetchSale, setShowModal
+    createSale,
+    updateSale,
+    fetchSale,
+    setShowModal
 } from '../../redux/saleSlice';
+
+import { fetchCustomers } from '../../redux/customerSlice';
+import { fetchProducts } from '../../redux/productSlice';
+import { fetchStores } from '../../redux/storeSlice';
 
 const SaleModal = () => {
     const dispatch = useDispatch();
-    const { showModal, modalType, selectedSale, customers, products, stores } = useSelector(state => state.sale);
+
+    // Get sale modal state
+    const { showModal, modalType, selectedSale } = useSelector(state => state.sale);
+
+    const customers = useSelector(state => state.customers.customers);
+    const products = useSelector(state => state.products.products);
+    const stores = useSelector(state => state.stores.stores);
+
 
     const [customerId, setCustomerId] = useState('');
     const [productId, setProductId] = useState('');
     const [storeId, setStoreId] = useState('');
     const [dateSold, setDateSold] = useState('');
 
+    // Load dropdown data when modal opens
+    useEffect(() => {
+        if (showModal) {
+            dispatch(fetchCustomers());
+            dispatch(fetchProducts());
+            dispatch(fetchStores());
+        }
+    }, [dispatch, showModal]);
+
+    // Populate form for edit
     useEffect(() => {
         if (modalType === 'edit' && selectedSale) {
             setCustomerId(selectedSale.customerId);
             setProductId(selectedSale.productId);
             setStoreId(selectedSale.storeId);
-            setDateSold(selectedSale.dateSold.slice(0, 10)); // format as yyyy-mm-dd
+            setDateSold(selectedSale.dateSold.slice(0, 10)); // format: yyyy-mm-dd
         } else {
             setCustomerId('');
             setProductId('');
@@ -31,24 +56,8 @@ const SaleModal = () => {
     const handleClose = () => dispatch(setShowModal(false));
 
     const handleSubmit = async () => {
-        // ✅ Frontend Validation
-        if (!customerId) {
-            alert("Please select a customer.");
-            return;
-        }
-
-        if (!productId) {
-            alert("Please select a product.");
-            return;
-        }
-
-        if (!storeId) {
-            alert("Please select a store.");
-            return;
-        }
-
-        if (!dateSold) {
-            alert("Please select a date.");
+        if (!customerId || !productId || !storeId || !dateSold) {
+            alert("Please fill out all fields.");
             return;
         }
 
@@ -79,7 +88,7 @@ const SaleModal = () => {
                             required
                         >
                             <option value="">Select Customer</option>
-                            {customers.map(c => (
+                            {Array.isArray(customers) && customers.map(c => (
                                 <option key={c.id} value={c.id}>{c.name}</option>
                             ))}
                         </Form.Select>
@@ -93,7 +102,7 @@ const SaleModal = () => {
                             required
                         >
                             <option value="">Select Product</option>
-                            {products.map(p => (
+                            {Array.isArray(products) && products.map(p => (
                                 <option key={p.id} value={p.id}>{p.name}</option>
                             ))}
                         </Form.Select>
@@ -107,7 +116,7 @@ const SaleModal = () => {
                             required
                         >
                             <option value="">Select Store</option>
-                            {stores.map(s => (
+                            {Array.isArray(stores) && stores.map(s => (
                                 <option key={s.id} value={s.id}>{s.name}</option>
                             ))}
                         </Form.Select>

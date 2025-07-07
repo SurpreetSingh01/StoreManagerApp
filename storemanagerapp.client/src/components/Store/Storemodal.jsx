@@ -10,9 +10,7 @@ import {
 
 const StoreModal = () => {
     const dispatch = useDispatch();
-    const showModal = useSelector(state => state.stores.showModal);
-    const modalType = useSelector(state => state.stores.modalType);
-    const selectedStore = useSelector(state => state.stores.selectedStore);
+    const { showModal, modalType, selectedStore } = useSelector(state => state.stores);
 
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
@@ -55,8 +53,8 @@ const StoreModal = () => {
 
         const store = { name: trimmedName, address: trimmedAddress };
 
-        if (modalType === 'edit') {
-            await dispatch(updateStore({ ...selectedStore, ...store }));
+        if (modalType === 'edit' && selectedStore?.id) {
+            await dispatch(updateStore({ ...store, id: selectedStore.id }));
         } else {
             await dispatch(createStore(store));
         }
@@ -72,7 +70,7 @@ const StoreModal = () => {
             </Modal.Header>
             <Modal.Body>
                 <Form>
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3" controlId="storeName">
                         <Form.Label>Name</Form.Label>
                         <Form.Control
                             type="text"
@@ -83,7 +81,8 @@ const StoreModal = () => {
                             minLength={2}
                         />
                     </Form.Group>
-                    <Form.Group>
+
+                    <Form.Group controlId="storeAddress">
                         <Form.Label>Address</Form.Label>
                         <Form.Control
                             type="text"

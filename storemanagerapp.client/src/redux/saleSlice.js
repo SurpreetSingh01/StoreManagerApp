@@ -1,7 +1,8 @@
 ﻿import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_URL = 'https://localhost:7040/api/sale';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_URL = `${BASE_URL}/sale`; // ✅ FIXED (removed duplicate /api)
 
 // Async Thunks for Sale CRUD
 export const fetchSale = createAsyncThunk('sale/fetchSale', async (_, { rejectWithValue }) => {
@@ -40,10 +41,10 @@ export const deleteSale = createAsyncThunk('sale/deleteSale', async (id, { rejec
     }
 });
 
-// Dropdown data
+// Dropdown Data
 export const fetchCustomers = createAsyncThunk('sale/fetchCustomers', async (_, { rejectWithValue }) => {
     try {
-        const res = await axios.get('https://localhost:7040/api/customer');
+        const res = await axios.get(`${BASE_URL}/customer`); // ✅ FIXED
         return res.data;
     } catch (err) {
         return rejectWithValue(err.response?.data || err.message);
@@ -52,7 +53,7 @@ export const fetchCustomers = createAsyncThunk('sale/fetchCustomers', async (_, 
 
 export const fetchProducts = createAsyncThunk('sale/fetchProducts', async (_, { rejectWithValue }) => {
     try {
-        const res = await axios.get('https://localhost:7040/api/product');
+        const res = await axios.get(`${BASE_URL}/product`); // ✅ FIXED
         return res.data;
     } catch (err) {
         return rejectWithValue(err.response?.data || err.message);
@@ -61,13 +62,14 @@ export const fetchProducts = createAsyncThunk('sale/fetchProducts', async (_, { 
 
 export const fetchStores = createAsyncThunk('sale/fetchStores', async (_, { rejectWithValue }) => {
     try {
-        const res = await axios.get('https://localhost:7040/api/store');
+        const res = await axios.get(`${BASE_URL}/store`); // ✅ FIXED
         return res.data;
     } catch (err) {
         return rejectWithValue(err.response?.data || err.message);
     }
 });
 
+// Slice
 const saleSlice = createSlice({
     name: 'sale',
     initialState: {

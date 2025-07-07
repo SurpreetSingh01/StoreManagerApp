@@ -1,13 +1,15 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { createCustomer, updateCustomer, setShowModal } from "../../redux/customerSlice";
+import {
+    createCustomer,
+    updateCustomer,
+    setShowModal
+} from "../../redux/customerSlice";
 
 const CustomerModal = () => {
     const dispatch = useDispatch();
-    const showModal = useSelector(state => state.customers.showModal);
-    const modalType = useSelector(state => state.customers.modalType);
-    const selectedCustomer = useSelector(state => state.customers.selectedCustomer);
+    const { showModal, modalType, selectedCustomer } = useSelector(state => state.customers);
 
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
@@ -24,8 +26,7 @@ const CustomerModal = () => {
 
     const handleClose = () => dispatch(setShowModal(false));
 
-    const handleSubmit = () => {
-        // ✅ Validation logic
+    const handleSubmit = async () => {
         const trimmedName = name.trim();
         const trimmedAddress = address.trim();
 
@@ -45,16 +46,16 @@ const CustomerModal = () => {
         }
 
         if (trimmedAddress.length < 5) {
-            alert("Address must be at least 5 characters long.");
+            alert("Address must be at least 5 characters.");
             return;
         }
 
         const customer = { name: trimmedName, address: trimmedAddress };
 
         if (modalType === 'edit' && selectedCustomer?.id) {
-            dispatch(updateCustomer({ ...customer, id: selectedCustomer.id }));
+            await dispatch(updateCustomer({ ...customer, id: selectedCustomer.id }));
         } else {
-            dispatch(createCustomer(customer));
+            await dispatch(createCustomer(customer));
         }
 
         handleClose();
@@ -73,18 +74,19 @@ const CustomerModal = () => {
                             type="text"
                             placeholder="Enter customer name"
                             value={name}
-                            onChange={e => setName(e.target.value)}
+                            onChange={(e) => setName(e.target.value)}
                             required
                             minLength={2}
                         />
                     </Form.Group>
+
                     <Form.Group controlId="formCustomerAddress" className="mb-3">
                         <Form.Label>Address</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Enter address"
                             value={address}
-                            onChange={e => setAddress(e.target.value)}
+                            onChange={(e) => setAddress(e.target.value)}
                             required
                             minLength={5}
                         />

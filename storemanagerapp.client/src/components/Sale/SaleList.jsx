@@ -87,7 +87,7 @@ const SaleList = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {sale.length > 0 ? (
+                    {Array.isArray(sale) && sale.length > 0 ? (
                         sale.map((saleItem) => (
                             <tr key={saleItem.id}>
                                 <td>{getNameById(customers, saleItem.customerId)}</td>

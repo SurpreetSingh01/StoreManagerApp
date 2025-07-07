@@ -10,17 +10,15 @@ import {
 
 const ProductModal = () => {
     const dispatch = useDispatch();
-    const showModal = useSelector(state => state.products.showModal);
-    const modalType = useSelector(state => state.products.modalType);
-    const selectedProduct = useSelector(state => state.products.selectedProduct);
+    const { showModal, modalType, selectedProduct } = useSelector(state => state.products);
 
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
 
     useEffect(() => {
         if (modalType === 'edit' && selectedProduct) {
-            setName(selectedProduct.name);
-            setPrice(selectedProduct.price);
+            setName(selectedProduct.name || '');
+            setPrice(selectedProduct.price || '');
         } else {
             setName('');
             setPrice('');
@@ -30,7 +28,6 @@ const ProductModal = () => {
     const handleClose = () => dispatch(setShowModal(false));
 
     const handleSubmit = async () => {
-        // ✅ Full Validation
         const trimmedName = name.trim();
         const numericPrice = parseFloat(price);
 
@@ -54,7 +51,10 @@ const ProductModal = () => {
             return;
         }
 
-        const product = { name: trimmedName, price: numericPrice };
+        const product = {
+            name: trimmedName,
+            price: numericPrice
+        };
 
         if (modalType === 'edit') {
             await dispatch(updateProduct({ ...selectedProduct, ...product }));
